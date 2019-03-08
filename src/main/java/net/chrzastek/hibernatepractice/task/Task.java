@@ -1,5 +1,6 @@
 package net.chrzastek.hibernatepractice.task;
 
+import net.chrzastek.hibernatepractice.taskList.TaskList;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -13,8 +14,10 @@ public class Task {
   private String description;
   private Date created;
   private int duration;
-
   private TaskFinancialDetails taskFinancialDetails;
+
+  private TaskList taskList;
+
 
   public Task() {
   }
@@ -74,5 +77,15 @@ public class Task {
 
   public void setTaskFinancialDetails(TaskFinancialDetails taskFinancialDetails) {
     this.taskFinancialDetails = taskFinancialDetails;
+  }
+
+  @ManyToOne
+  @JoinColumn(name = "TASKLIST_ID")
+  public TaskList getTaskList() {
+    return taskList;
+  }
+
+  public void setTaskList(TaskList taskList) {
+    this.taskList = taskList;
   }
 }
