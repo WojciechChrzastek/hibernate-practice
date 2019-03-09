@@ -15,9 +15,7 @@ public class Task {
   private Date created;
   private int duration;
   private TaskFinancialDetails taskFinancialDetails;
-
   private TaskList taskList;
-
 
   public Task() {
   }
