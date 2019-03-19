@@ -7,6 +7,15 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedNativeQuery(
+        name = "Company.retrieveCompaniesWithGivenName",
+        query = "SELECT * FROM COMPANIES" +
+                " WHERE COMPANY_NAME LIKE CONCAT(:PARAMETER, '%')",
+        resultClass = Company.class
+)
+
+//ALTERNATIVELY -> " WHERE COMPANY_NAME LIKE SUBSTRING(:SIGNS, 1, 4)",
+
 @Entity
 @Table(name = "COMPANIES")
 public class Company {

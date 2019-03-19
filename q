@@ -1,0 +1,139 @@
+[1;33mdiff --git a/src/main/java/net/chrzastek/hibernatepractice/manytomany/Company.java b/src/main/java/net/chrzastek/hibernatepractice/manytomany/Company.java[m
+[1;33mindex 5b42b1f..42822b9 100644[m
+[1;33m--- a/src/main/java/net/chrzastek/hibernatepractice/manytomany/Company.java[m
+[1;33m+++ b/src/main/java/net/chrzastek/hibernatepractice/manytomany/Company.java[m
+[1;35m@@ -7,6 +7,15 @@[m [mimport javax.validation.constraints.NotNull;[m
+ import java.util.ArrayList;[m
+ import java.util.List;[m
+ [m
+[1;32m+[m[1;32m@NamedNativeQuery([m
+[1;32m+[m[1;32m        name = "Task.retrieveCompaniesWithGivenName",[m
+[1;32m+[m[1;32m        query = "SELECT * FROM COMPANIES" +[m
+[1;32m+[m[1;32m                " WHERE COMPANY_NAME LIKE CONCAT(:PARAMETER, '%')",[m
+[1;32m+[m[1;32m        resultClass = Company.class[m
+[1;32m+[m[1;32m)[m
+[1;32m+[m
+[1;32m+[m[1;32m//" WHERE COMPANY_NAME LIKE SUBSTRING(:SIGNS, 1, 4)",[m
+[1;32m+[m
+ @Entity[m
+ @Table(name = "COMPANIES")[m
+ public class Company {[m
+[1;33mdiff --git a/src/main/java/net/chrzastek/hibernatepractice/manytomany/Employee.java b/src/main/java/net/chrzastek/hibernatepractice/manytomany/Employee.java[m
+[1;33mindex 784a3ea..0ed19a3 100644[m
+[1;33m--- a/src/main/java/net/chrzastek/hibernatepractice/manytomany/Employee.java[m
+[1;33m+++ b/src/main/java/net/chrzastek/hibernatepractice/manytomany/Employee.java[m
+[1;35m@@ -7,6 +7,11 @@[m [mimport javax.validation.constraints.NotNull;[m
+ import java.util.ArrayList;[m
+ import java.util.List;[m
+ [m
+[1;32m+[m[1;32m@NamedQuery([m
+[1;32m+[m[1;32m        name = "Employee.retrieveEmployeesWithGivenName",[m
+[1;32m+[m[1;32m        query = "FROM Employee WHERE lastname = :LASTNAME"[m
+[1;32m+[m[1;32m)[m
+[1;32m+[m
+ @Entity[m
+ @Table(name = "EMPLOYEES")[m
+ public class Employee {[m
+[1;33mdiff --git a/src/main/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDao.java b/src/main/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDao.java[m
+[1;33mindex f99675a..28bce55 100644[m
+[1;33m--- a/src/main/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDao.java[m
+[1;33m+++ b/src/main/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDao.java[m
+[1;35m@@ -1,12 +1,20 @@[m
+ package net.chrzastek.hibernatepractice.manytomany.dao;[m
+ [m
+ import net.chrzastek.hibernatepractice.manytomany.Company;[m
+[1;32m+[m[1;32mimport org.springframework.data.jpa.repository.Query;[m
+ import org.springframework.data.repository.CrudRepository;[m
+[1;32m+[m[1;32mimport org.springframework.data.repository.query.Param;[m
+ import org.springframework.stereotype.Repository;[m
+[1;32m+[m[1;32mimport org.springframework.transaction.annotation.Transactional;[m
+ [m
+[1;31m-import javax.transaction.Transactional;[m
+[1;32m+[m[1;32mimport java.util.List;[m
+ [m
+ @Transactional[m
+ @Repository[m
+ public interface CompanyDao extends CrudRepository<Company, Integer> {[m
+[1;32m+[m
+[1;32m+[m[1;32m  @Query(nativeQuery = true)[m
+[1;32m+[m[1;32m  List<Company> retrieveCompaniesWithGivenName(@Param("PARAMETER") String parameter);[m
+[1;32m+[m
+[1;32m+[m
+ }[m
+[1;33mdiff --git a/src/test/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDaoTestSuite.java b/src/test/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDaoTestSuite.java[m
+[1;33mindex d5bfa1f..a318a79 100644[m
+[1;33m--- a/src/test/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDaoTestSuite.java[m
+[1;33m+++ b/src/test/java/net/chrzastek/hibernatepractice/manytomany/dao/CompanyDaoTestSuite.java[m
+[1;35m@@ -9,12 +9,17 @@[m [mimport org.springframework.beans.factory.annotation.Autowired;[m
+ import org.springframework.boot.test.context.SpringBootTest;[m
+ import org.springframework.test.context.junit4.SpringRunner;[m
+ [m
+[1;32m+[m[1;32mimport java.util.List;[m
+[1;32m+[m
+ @RunWith(SpringRunner.class)[m
+ @SpringBootTest[m
+ public class CompanyDaoTestSuite {[m
+   @Autowired[m
+   CompanyDao companyDao;[m
+ [m
+[1;32m+[m[1;32m  @Autowired[m
+[1;32m+[m[1;32m  EmployeeDao employeeDao;[m
+[1;32m+[m
+   @Test[m
+   public void testSaveManyToMany() {[m
+     //Given[m
+[1;35m@@ -60,4 +65,54 @@[m [mpublic class CompanyDaoTestSuite {[m
+       //do nothing[m
+     }[m
+   }[m
+[1;32m+[m
+[1;32m+[m[1;32m//  @Test[m
+[1;32m+[m[1;32m//  public void testQueries() {[m
+[1;32m+[m[1;32m//    //Given[m
+[1;32m+[m[1;32m//    Employee johnSmith = new Employee("John", "Smith");[m
+[1;32m+[m[1;32m//    Employee stephanieClarckson = new Employee("Stephanie", "Clarckson");[m
+[1;32m+[m[1;32m//    Employee lindaKovalsky = new Employee("Linda", "Kovalsky");[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    Company softwareMachine = new Company("Software Machine");[m
+[1;32m+[m[1;32m//    Company dataMaesters = new Company("Data Maesters");[m
+[1;32m+[m[1;32m//    Company greyMatter = new Company("Grey Matter");[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    softwareMachine.getEmployees().add(johnSmith);[m
+[1;32m+[m[1;32m//    dataMaesters.getEmployees().add(stephanieClarckson);[m
+[1;32m+[m[1;32m//    dataMaesters.getEmployees().add(lindaKovalsky);[m
+[1;32m+[m[1;32m//    greyMatter.getEmployees().add(johnSmith);[m
+[1;32m+[m[1;32m//    greyMatter.getEmployees().add(lindaKovalsky);[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    johnSmith.getCompanies().add(softwareMachine);[m
+[1;32m+[m[1;32m//    johnSmith.getCompanies().add(greyMatter);[m
+[1;32m+[m[1;32m//    stephanieClarckson.getCompanies().add(dataMaesters);[m
+[1;32m+[m[1;32m//    lindaKovalsky.getCompanies().add(dataMaesters);[m
+[1;32m+[m[1;32m//    lindaKovalsky.getCompanies().add(greyMatter);[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    companyDao.save(softwareMachine);[m
+[1;32m+[m[1;32m//    int softwareMachineId = softwareMachine.getId();[m
+[1;32m+[m[1;32m//    companyDao.save(dataMaesters);[m
+[1;32m+[m[1;32m//    int dataMaestersId = dataMaesters.getId();[m
+[1;32m+[m[1;32m//    companyDao.save(greyMatter);[m
+[1;32m+[m[1;32m//    int greyMatterId = greyMatter.getId();[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    //When[m
+[1;32m+[m[1;32m//    List<Employee> employeesByGivenLastname = employeeDao.retrieveEmployeesWithGivenName("Smith");[m
+[1;32m+[m[1;32m//    List<Company> companiesByGivenNameSigns = companyDao.retrieveCompaniesWithGivenName("Sof%");[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    //Then[m
+[1;32m+[m[1;32m//    Assert.assertEquals(1, employeesByGivenLastname.size());[m
+[1;32m+[m[1;32m//    Assert.assertEquals(1, companiesByGivenNameSigns.size());[m
+[1;32m+[m[1;32m//[m
+[1;32m+[m[1;32m//    //CleanUp[m
+[1;32m+[m[1;32m//    try {[m
+[1;32m+[m[1;32m//      companyDao.deleteById(softwareMachineId);[m
+[1;32m+[m[1;32m//      companyDao.deleteById(dataMaestersId);[m
+[1;32m+[m[1;32m//      companyDao.deleteById(greyMatterId);[m
+[1;32m+[m[1;32m//    } catch (Exception e) {[m
+[1;32m+[m[1;32m//      //do nothing[m
+[1;32m+[m[1;32m//    }[m
+[1;32m+[m[1;32m//  }[m
+[1;32m+[m
+[1;32m+[m
+ }[m
