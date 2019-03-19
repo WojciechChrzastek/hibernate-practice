@@ -2,7 +2,7 @@ package net.chrzastek.hibernatepractice.invoice.dao;
 
 import net.chrzastek.hibernatepractice.invoice.Invoice;
 import net.chrzastek.hibernatepractice.invoice.Item;
-import net.chrzastek.hibernatepractice.invoice.Product;git
+import net.chrzastek.hibernatepractice.invoice.Product;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
